@@ -63,7 +63,7 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../Model/order');
-const { createOrder, captureOrder } = require('../paypalService'); // Import PayPal service
+ // Import PayPal service
 
 // Create a new order
 router.post('/', async (req, res) => {

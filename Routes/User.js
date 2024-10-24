@@ -1,6 +1,6 @@
 const express = require('express');
 const User = require('../Model/User'); // Adjust the path as necessary
-const authMiddleware = require('../Middleware /AuthMiddleware'); // Corrected path
+const authMiddleware = require('../Middleware/AuthMiddleware'); // Corrected path
 const router = express.Router();
 
 // Get all users

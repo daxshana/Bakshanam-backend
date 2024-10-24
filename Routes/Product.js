@@ -51,7 +51,8 @@ router.post("/", upload.single('image'), async (req, res) => { // Ensure 'image'
       name: req.body.name,
       price: req.body.price,
       description: req.body.description || '', // Optional description
-      imageUrl: `/uploads/${req.file.filename}` // Set imageUrl to the URL path
+      imageUrl: `/uploads/${req.file.filename}`, // Set imageUrl to the URL path
+      customerName: req.body.customerName
     });
 
     const savedProduct = await newProduct.save();

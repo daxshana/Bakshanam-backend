@@ -9,7 +9,9 @@ const userRouter = require('./Routes/User'); // Adjust the path as needed
 const ordersRoutes = require('./Routes/order'); // Import your orders routes
 const productRoutes = require('./Routes/Product'); // Adjust the path if necessary
 const multer = require('multer');
-const paypal = require('@paypal/checkout-server-sdk');
+const homeMakersRoutes = require('./Routes/Homemaker'); // Adjust the path as necessary
+const HomemakeruserRoutes = require("./Routes/Homemakeruser");
+// const paypal = require('@paypal/checkout-server-sdk');
 ; // Ensure the path is correct
 
 const app = express();
@@ -103,7 +105,13 @@ app.post('/api/auth/login', async (req, res) => {
 // Protecting user routes with auth middleware
 app.use('/api/users', authMiddleware, userRouter);
 app.use('/api/orders', ordersRoutes); // Ensure this path is correct
+app.use('/api/home-makers', homeMakersRoutes);
 app.use('/api/products', productRoutes); // Ensure this path is correct
 app.use('/uploads', express.static('uploads')); 
+app.use('/api/homemakeruser', HomemakeruserRoutes);
+
+
+
+app.us
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
