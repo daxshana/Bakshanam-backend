@@ -1,18 +1,20 @@
-const express = require('express');
-const router = express.Router();
-const { registerUser, loginUser } = require('../controllers/authController');
-const { getOrders } = require('../controllers/orderController');
-// @route POST /api/register
-// @desc Register a new user
-router.post('/register', registerUser);
+// const express = require('express');
+// const router = express.Router();
 
-// @route POST /api/login
-// @desc Login user and return token
-router.post('/login', loginUser);
+// // Example handler for registration
+// const registerUser = (req, res) => {
+//     // Logic for user registration
+//     res.send('User registered successfully');
+// };
 
+// // Example handler for login
+// const loginUser = (req, res) => {
+//     // Logic for user login
+//     res.send('User logged in successfully');
+// };
 
-router.get('/orders', getOrders);
+// // Define your routes
+// router.post('/register', registerUser); // Ensure registerUser is defined
+// router.post('/login', loginUser); // Ensure loginUser is defined
 
-router.get('/users', getUsers);
-
-module.exports = router;
+// module.exports = router;

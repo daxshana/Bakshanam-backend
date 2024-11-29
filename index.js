@@ -11,6 +11,10 @@ const productRoutes = require('./Routes/Product'); // Adjust the path if necessa
 const multer = require('multer');
 const homeMakersRoutes = require('./Routes/Homemaker'); // Adjust the path as necessary
 const HomemakeruserRoutes = require("./Routes/Homemakeruser");
+const contactRoutes = require("./Routes/contactRoutes");
+const authRoutes = require('./Routes/Auth');
+const paymentRoutes = require("./Routes/Payment"); // Adjust path as necessary
+const cartRoutes = require("./Routes/Cart");
 // const paypal = require('@paypal/checkout-server-sdk');
 ; // Ensure the path is correct
 
@@ -31,19 +35,41 @@ mongoose.connect(MONGO_URI, {
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('Could not connect to MongoDB:', err));
 
-// Authentication middleware
+// // Authentication middleware
+// const authMiddleware = (req, res, next) => {
+//     const token = req.header('Authorization');
+//     if (!token) {
+//         return res.status(401).json({ message: 'No token, authorization denied' });
+//     }
+
+//     try {
+//         const decoded = jwt.verify(token.split(' ')[1], JWT_SECRET);
+//         req.user = decoded.user; // Assign user data to request object
+//         next();
+//     } catch (err) {
+//         res.status(401).json({ message: 'Token is not valid' });
+//     }
+// };
+
 const authMiddleware = (req, res, next) => {
-    const token = req.header('Authorization');
-    if (!token) {
-        return res.status(401).json({ message: 'No token, authorization denied' });
+    const authHeader = req.header('Authorization');
+
+    // Check if Authorization header exists and is in Bearer token format
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Unauthorized: Please check your login status.' });
     }
 
+    // Extract the token from the "Bearer <token>" format
+    const token = authHeader.split(' ')[1];
+
+    // Verify the token
     try {
-        const decoded = jwt.verify(token.split(' ')[1], JWT_SECRET);
-        req.user = decoded.user; // Assign user data to request object
-        next();
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.user = decoded.user; // Attach user info to request
+        next(); // Proceed to next middleware or route handler
     } catch (err) {
-        res.status(401).json({ message: 'Token is not valid' });
+        console.error("Token verification error:", err.message);
+        res.status(401).json({ message: 'Token is not valid or has expired.' });
     }
 };
 
@@ -74,42 +100,71 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
+
 // Login route
 app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
 
-    console.log("Login Attempt:", { email, password }); // Log the attempt
-
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            console.log("User not found"); // Log if the user doesn't exist
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            console.log("Password mismatch"); // Log if passwords don't match
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+        // Include user role in the JWT token
+        const token = jwt.sign(
+            { userId: user._id, role: user.role }, // Including role in the token
+            JWT_SECRET,
+            { expiresIn: '1h' }
+        );
 
-        res.status(200).json({ success: true, message: 'Login successful', token });
+        res.status(200).json({ success: true, message: 'Login successful', token, role: user.role,userId: user._id });
     } catch (error) {
         console.error('Login Error:', error);
         res.status(500).json({ message: 'Server error. Try again later.' });
     }
 });
 
+// Fetch user details by ID
+app.get('/api/auth/user/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Validate if ID is a valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: 'Invalid user ID' });
+        }
+
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        res.status(200).json({ success: true, data: user });
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).json({ success: false, message: 'Server error. Try again later.' });
+    }
+});
+
+
+
 // Protecting user routes with auth middleware
-app.use('/api/users', authMiddleware, userRouter);
+app.use('/api/users', userRouter);
 app.use('/api/orders', ordersRoutes); // Ensure this path is correct
 app.use('/api/home-makers', homeMakersRoutes);
 app.use('/api/products', productRoutes); // Ensure this path is correct
 app.use('/uploads', express.static('uploads')); 
 app.use('/api/homemakeruser', HomemakeruserRoutes);
-
+app.use("/api", contactRoutes);
+app.use("/api", paymentRoutes);
+app.use("/api/cart", cartRoutes);
 
 
 app.us

@@ -1,3 +1,5 @@
+// models/order.js
+
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
@@ -31,7 +33,7 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'completed', 'canceled'],
+        enum: ['pending', 'in progress', 'completed', 'canceled'],
         default: 'pending',
     },
 });

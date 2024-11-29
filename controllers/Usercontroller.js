@@ -1,12 +1,12 @@
 // import User from "../Model/User.js";
-// // import generateToken from "../utils/generateToken.js";
+// import generateToken from "../utils/generateToken.js";
 
-// //no 1 for register new users
-// //no 2 for login users 
-// //no 3 for logout users
-// //no 4 for view all users (admin)
+//no 1 for register new users
+//no 2 for login users 
+//no 3 for logout users
+//no 4 for view all users (admin)
 
-// //no1 
+//no1 
 // const login = async(req,res) => {
    
 //     const { email, password } = req.body;
@@ -228,3 +228,25 @@
 //         updateUserRole,
 //         deactivateUser,
 //         activateUser}; // Export the functions to be used in other files
+
+
+// const User = require('../Model/User'); // Adjust the import based on your project structure
+
+// exports.blockUser = async (req, res) => {
+//     try {
+//         const userId = req.params.id; // Get user ID from the route parameter
+//         const user = await User.findById(userId); // Find the user in the database
+
+//         if (!user) {
+//             return res.status(404).json({ message: 'User not found' }); // Return 404 if user not found
+//         }
+
+//         user.isBlocked = true; // Set the isBlocked field (or however you're handling blocking)
+//         await user.save(); // Save the changes to the database
+
+//         return res.status(200).json(user); // Return the updated user
+//     } catch (error) {
+//         console.error(error); // Log error for debugging
+//         return res.status(500).json({ message: 'Server error' }); // Return 500 for server errors
+//     }
+// };
